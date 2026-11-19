@@ -1,0 +1,45 @@
+# Configuration MINIMALE de kube-prometheus-stack pour un poste de dev.
+defaultRules:
+  create: false              # pas de règles d'alerte prédéfinies (on n'a pas d'Alertmanager)
+alertmanager:
+  enabled: false
+nodeExporter:
+  enabled: false             # inutile ici et problématique sur kind/WSL2 (mount propagation)
+kubeStateMetrics:
+  enabled: true              # nécessaire pour les limits/requests (kube_pod_container_resource_limits)
+# Composants du control-plane de kind non scrapables depuis l'extérieur -> on évite des cibles "DOWN"
+kubeApiServer: {enabled: false}
+kubeControllerManager: {enabled: false}
+kubeScheduler: {enabled: false}
+kubeProxy: {enabled: false}
+kubeEtcd: {enabled: false}
+coreDns: {enabled: false}
+kubelet:
+  enabled: true              # expose cAdvisor : container_cpu_usage_seconds_total, throttling...
+
+prometheus:
+  service:
+    type: NodePort
+    nodePort: 30090          # -> localhost:9090 (voir kind-config.yaml)
+  prometheusSpec:
+    scrapeInterval: 15s
+    retention: 12h
+    # IMPORTANT : par défaut Prometheus ne prend que les ServiceMonitors portant le label du release Helm.
+    # Ces 4 lignes lui font découvrir TOUS les ServiceMonitor/PodMonitor/Rules du cluster (ex. celui de Beyla).
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+    resources:
+      requests: {cpu: 100m, memory: 400Mi}
+
+grafana:
+  adminPassword: admin       # lab local uniquement !
+  defaultDashboardsEnabled: false
+  service:
+    type: NodePort
+    nodePort: 30300          # -> localhost:3000
+  sidecar:
+    dashboards:
+      enabled: true          # charge automatiquement tout ConfigMap labellisé grafana_dashboard=1
+      searchNamespace: ALL
