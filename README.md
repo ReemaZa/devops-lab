@@ -1,11 +1,11 @@
-# devops-lab : mon laboratoire DevOps réutilisable
+# devops-lab : Laboratoire DevOps réutilisable
 
 Un cluster Kubernetes local (**kind**) + **Prometheus + Grafana**, reproductible en une commande sur n'importe quelle machine
 (Windows + Docker Desktop + WSL2 Ubuntu, ou Linux natif). Chaque TP/projet vient *se brancher* sur ce lab au lieu de réinstaller sa propre stack.
 
 ## Démarrage rapide
 ```bash
-git clone git@github.com:<VOTRE_USER>/devops-lab.git ~/dev/devops-lab && cd ~/dev/devops-lab
+git clone git@github.com:ReemaZa/devops-lab.git ~/dev/devops-lab && cd ~/dev/devops-lab
 make tools     # une fois par machine : kubectl, kind, helm
 make check     # vérifie Docker, WSL2, BTF/eBPF
 make up        # cluster + Prometheus + Grafana (3-5 min)
